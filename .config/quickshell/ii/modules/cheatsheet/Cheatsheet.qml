@@ -12,17 +12,6 @@ import Quickshell.Hyprland
 
 Scope { // Scope
     id: root
-    property var tabButtonList: [
-        {
-            "icon": "keyboard",
-            "name": Translation.tr("Keybinds")
-        },
-        {
-            "icon": "experiment",
-            "name": Translation.tr("Elements")
-        },
-    ]
-    property int selectedTab: 0
 
     Loader {
         id: cheatsheetLoader
@@ -30,9 +19,40 @@ Scope { // Scope
 
         sourceComponent: PanelWindow { // Window
             id: cheatsheetRoot
-            visible: cheatsheetLoader.active
+	    visible: cheatsheetLoader.active
 
-            anchors {
+	    function calculateMinScreenDimension() {
+		    var screens = Qt.application.screens;
+
+		if (screens.length === 0) {
+			return { width: 1280, height: 720 };
+		}
+
+		var minWidth = screens[0].width;
+		var minHeight = screens[0].height;
+
+		for (var i = 0; i < screens.length; i++) {
+			if (screens[i].width < minWidth) {
+				minWidth = screens[i].width;
+			}
+			
+			if (screens[i].height < minHeight) {
+				minHeight = screens[i].height;
+			}
+		}
+
+		return { width: minWidth, height: minHeight };
+	}
+
+
+	onVisibleChanged: {
+		if (visible) {
+			var dims = calculateMinScreenDimension();
+			cheatsheetBackground.width = dims.width * 0.9;
+			cheatsheetBackground.height = dims.height * 0.9;
+		}
+	}
+	anchors {
                 top: true
                 bottom: true
                 left: true
@@ -76,8 +96,8 @@ Scope { // Scope
                 border.color: Appearance.colors.colLayer0Border
                 radius: Appearance.rounding.windowRounding
                 property real padding: 30
-                implicitWidth: cheatsheetColumnLayout.implicitWidth + padding * 2
-                implicitHeight: cheatsheetColumnLayout.implicitHeight + padding * 2
+                width: 1
+                height: 1
 
                 Keys.onPressed: event => { // Esc to close
                     if (event.key === Qt.Key_Escape) {
@@ -127,69 +147,33 @@ Scope { // Scope
 
                 ColumnLayout { // Real content
                     id: cheatsheetColumnLayout
-                    anchors.centerIn: parent
-                    spacing: 20
+		    anchors.centerIn: parent
+		    anchors.fill: parent
+		    anchors.margins: cheatsheetBackground.padding
+            spacing: 20
 
-                    StyledText {
-                        id: cheatsheetTitle
-                        Layout.alignment: Qt.AlignHCenter
-                        font.family: Appearance.font.family.title
-                        font.pixelSize: Appearance.font.pixelSize.title
-                        text: Translation.tr("Cheat sheet")
-                    }
-                    PrimaryTabBar { // Tab strip
-                        id: tabBar
-                        tabButtonList: root.tabButtonList
-                        externalTrackedTab: root.selectedTab
-                        function onCurrentIndexChanged(currentIndex) {
-                            root.selectedTab = currentIndex;
-                        }
-                    }
+            StyledText {
+                id: cheatsheetTitle
+                Layout.alignment: Qt.AlignHCenter
+                font.family: Appearance.font.family.title
+                font.pixelSize: Appearance.font.pixelSize.title
+                text: Translation.tr("Cheat sheet")
+            }
+            
+            ScrollView {
+			    Layout.fillWidth: true
+			    Layout.fillHeight: true
+			    clip: true
+			    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+			    ScrollBar.horizontal.policy: ScrollBar.AsNeeded
 
-                    SwipeView { // Content pages
-                        id: swipeView
-                        Layout.topMargin: 5
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        spacing: 10
+			    CheatsheetKeybinds {}
 
-                        Behavior on implicitWidth {
-                            id: contentWidthBehavior
-                            enabled: false
-                            animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-                        }
-                        Behavior on implicitHeight {
-                            id: contentHeightBehavior
-                            enabled: false
-                            animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
-                        }
-
-                        currentIndex: tabBar.externalTrackedTab
-                        onCurrentIndexChanged: {
-                            contentWidthBehavior.enabled = true;
-                            contentHeightBehavior.enabled = true;
-                            tabBar.enableIndicatorAnimation = true;
-                            root.selectedTab = currentIndex;
-                        }
-
-                        clip: true
-                        layer.enabled: true
-                        layer.effect: OpacityMask {
-                            maskSource: Rectangle {
-                                width: swipeView.width
-                                height: swipeView.height
-                                radius: Appearance.rounding.small
-                            }
-                        }
-
-                        CheatsheetKeybinds {}
-                        CheatsheetPeriodicTable {}
+		    }
                     }
                 }
             }
-        }
-    }
-
+        } 
     IpcHandler {
         target: "cheatsheet"
 

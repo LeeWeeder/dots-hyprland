@@ -62,10 +62,6 @@ Item { // Bar content region
         onScrollDown: root.brightnessMonitor.setBrightness(root.brightnessMonitor.brightness - 0.05)
         onScrollUp: root.brightnessMonitor.setBrightness(root.brightnessMonitor.brightness + 0.05)
         onMovedAway: GlobalStates.osdBrightnessOpen = false
-        onPressed: event => {
-            if (event.button === Qt.LeftButton)
-                GlobalStates.sidebarLeftOpen = !GlobalStates.sidebarLeftOpen;
-        }
 
         // Visual content
         ScrollHint {
@@ -80,13 +76,11 @@ Item { // Bar content region
         RowLayout {
             id: leftSectionRowLayout
             anchors.fill: parent
-            spacing: 10
+	    spacing: 10
 
-            LeftSidebarButton { // Left sidebar button
-                Layout.alignment: Qt.AlignVCenter
-                Layout.leftMargin: Appearance.rounding.screenRounding
-                colBackground: barLeftSideMouseArea.hovered ? Appearance.colors.colLayer1Hover : ColorUtils.transparentize(Appearance.colors.colLayer1Hover, 1)
-            }
+	    Item {
+		Layout.preferredWidth: 10
+	    }
 
             ActiveWindow {
                 visible: root.useShortenedForm === 0
@@ -97,7 +91,7 @@ Item { // Bar content region
         }
     }
 
-    Row { // Middle section
+    RowLayout { // Middle section
         id: middleSection
         anchors {
             top: parent.top
@@ -108,8 +102,8 @@ Item { // Bar content region
 
         BarGroup {
             id: leftCenterGroup
-            anchors.verticalCenter: parent.verticalCenter
-            implicitWidth: root.centerSideModuleWidth
+            Layout.preferredWidth: root.centerSideModuleWidth
+            Layout.fillHeight: false
 
             Resources {
                 alwaysShowAllResources: root.useShortenedForm === 2
@@ -128,7 +122,6 @@ Item { // Bar content region
 
         BarGroup {
             id: middleCenterGroup
-            anchors.verticalCenter: parent.verticalCenter
             padding: workspacesWidget.widgetPadding
 
             Workspaces {
@@ -154,9 +147,9 @@ Item { // Bar content region
 
         MouseArea {
             id: rightCenterGroup
-            anchors.verticalCenter: parent.verticalCenter
-            implicitWidth: root.centerSideModuleWidth
+            implicitWidth: rightCenterGroupContent.implicitWidth
             implicitHeight: rightCenterGroupContent.implicitHeight
+            Layout.preferredWidth: root.centerSideModuleWidth
 
             onPressed: {
                 GlobalStates.sidebarRightOpen = !GlobalStates.sidebarRightOpen;
@@ -164,12 +157,12 @@ Item { // Bar content region
 
             BarGroup {
                 id: rightCenterGroupContent
-                anchors.fill: parent
+                // anchors.fill: parent
 
                 ClockWidget {
                     showDate: (Config.options.bar.verbose && root.useShortenedForm < 2)
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.fillWidth: true
+                    Layout.fillWidth: false
                 }
 
                 UtilButtons {
@@ -181,6 +174,16 @@ Item { // Bar content region
                     visible: (root.useShortenedForm < 2 && UPower.displayDevice.isLaptopBattery)
                     Layout.alignment: Qt.AlignVCenter
                 }
+
+                // Weather
+            Loader {
+                Layout.leftMargin: 4
+                active: Config.options.bar.weather.enable
+
+                sourceComponent: BarGroup {
+                    WeatherBar {}
+                }
+            }
             }
         }
     }
@@ -293,7 +296,6 @@ Item { // Bar content region
                     HyprlandXkbIndicator {
                         Layout.alignment: Qt.AlignVCenter
                         Layout.rightMargin: indicatorsRowLayout.realSpacing
-                        color: rightSidebarButton.colText
                     }
                     Revealer {
                         reveal: Notifications.silent || Notifications.unread > 0
@@ -321,28 +323,17 @@ Item { // Bar content region
                         color: rightSidebarButton.colText
                     }
                 }
-            }
+	}
+
+	Item {
+		Layout.fillWidth: true
+	}
 
             SysTray {
                 visible: root.useShortenedForm === 0
                 Layout.fillWidth: false
                 Layout.fillHeight: true
                 invertSide: Config?.options.bar.bottom
-            }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-
-            // Weather
-            Loader {
-                Layout.leftMargin: 4
-                active: Config.options.bar.weather.enable
-
-                sourceComponent: BarGroup {
-                    WeatherBar {}
-                }
             }
         }
     }

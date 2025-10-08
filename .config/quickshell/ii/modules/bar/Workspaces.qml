@@ -5,6 +5,7 @@ import qs.modules.common.widgets
 import qs.modules.common.functions
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -18,8 +19,7 @@ Item {
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.QsWindow.window?.screen)
     readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
     
-    readonly property int workspacesShown: Config.options.bar.workspaces.shown
-    readonly property int workspaceGroup: Math.floor((monitor?.activeWorkspace?.id - 1) / root.workspacesShown)
+    readonly property int workspaceGroup: Math.floor((monitor?.activeWorkspace?.id - 1) / Config.options.bar.workspaces.shown)
     property list<bool> workspaceOccupied: []
     property int widgetPadding: 4
     property int workspaceButtonWidth: 26
@@ -28,7 +28,7 @@ Item {
     property real workspaceIconSizeShrinked: workspaceButtonWidth * 0.55
     property real workspaceIconOpacityShrinked: 1
     property real workspaceIconMarginShrinked: -4
-    property int workspaceIndexInGroup: (monitor?.activeWorkspace?.id - 1) % root.workspacesShown
+    property int workspaceIndexInGroup: (monitor?.activeWorkspace?.id - 1) % Config.options.bar.workspaces.shown
 
     property bool showNumbers: false
     Timer {
@@ -56,8 +56,8 @@ Item {
 
     // Function to update workspaceOccupied
     function updateWorkspaceOccupied() {
-        workspaceOccupied = Array.from({ length: root.workspacesShown }, (_, i) => {
-            return Hyprland.workspaces.values.some(ws => ws.id === workspaceGroup * root.workspacesShown + i + 1);
+        workspaceOccupied = Array.from({ length: Config.options.bar.workspaces.shown }, (_, i) => {
+            return Hyprland.workspaces.values.some(ws => ws.id === workspaceGroup * Config.options.bar.workspaces.shown + i + 1);
         })
     }
 
@@ -79,8 +79,8 @@ Item {
         updateWorkspaceOccupied();
     }
 
-    implicitWidth: root.vertical ? Appearance.sizes.verticalBarWidth : (root.workspaceButtonWidth * root.workspacesShown)
-    implicitHeight: root.vertical ? (root.workspaceButtonWidth * root.workspacesShown) : Appearance.sizes.barHeight
+    implicitWidth: root.vertical ? Appearance.sizes.verticalBarWidth : backgroundLayout.implicitWidth
+    implicitHeight: root.vertical ? backgroundLayout.implicitHeight : Appearance.sizes.barHeight
 
     // Scroll to switch workspaces
     WheelHandler {
@@ -104,20 +104,24 @@ Item {
     }
 
     // Workspaces - background
-    Grid {
+    GridLayout {
+        id: backgroundLayout
         z: 1
-        anchors.centerIn: parent
+        anchors.fill: parent
+        implicitHeight: root.vertical ? root.workspaceButtonWidth : Appearance.sizes.barHeight
+        implicitWidth: root.vertical ? Appearance.sizes.verticalBarWidth : root.workspaceButtonWidth
 
         rowSpacing: 0
         columnSpacing: 0
-        columns: root.vertical ? 1 : root.workspacesShown
-        rows: root.vertical ? root.workspacesShown : 1
+        columns: root.vertical ? 1 : -1
 
         Repeater {
-            model: root.workspacesShown
+            model: Config.options.bar.workspaces.shown
 
             Rectangle {
                 z: 1
+                Layout.alignment: root.vertical ? Qt.AlignHCenter : Qt.AlignVCenter
+
                 implicitWidth: workspaceButtonWidth
                 implicitHeight: workspaceButtonWidth
                 radius: (width / 2)
@@ -191,24 +195,26 @@ Item {
     }
 
     // Workspaces - numbers
-    Grid {
+    GridLayout {
+        id: rowLayoutNumbers
         z: 3
 
-        columns: root.vertical ? 1 : root.workspacesShown
-        rows: root.vertical ? root.workspacesShown : 1
+        columns: vertical ? 1 : -1
         columnSpacing: 0
         rowSpacing: 0
 
         anchors.fill: parent
+        implicitHeight: vertical ? Appearance.sizes.verticalBarWidth : Appearance.sizes.barHeight
+        implicitWidth: vertical ? Appearance.sizes.verticalBarWidth : Appearance.sizes.verticalBarWidth
 
         Repeater {
-            model: root.workspacesShown
+            model: Config.options.bar.workspaces.shown
 
             Button {
                 id: button
-                property int workspaceValue: workspaceGroup * root.workspacesShown + index + 1
-                implicitHeight: vertical ? Appearance.sizes.verticalBarWidth : Appearance.sizes.barHeight
-                implicitWidth: vertical ? Appearance.sizes.verticalBarWidth : Appearance.sizes.verticalBarWidth
+                property int workspaceValue: workspaceGroup * Config.options.bar.workspaces.shown + index + 1
+                Layout.fillHeight: !root.vertical
+                Layout.fillWidth: root.vertical
                 onPressed: Hyprland.dispatch(`workspace ${workspaceValue}`)
                 width: vertical ? undefined : workspaceButtonWidth
                 height: vertical ? workspaceButtonWidth : undefined

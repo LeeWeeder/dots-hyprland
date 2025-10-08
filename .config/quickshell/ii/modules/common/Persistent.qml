@@ -11,15 +11,6 @@ Singleton {
     property string fileName: "states.json"
     property string filePath: `${root.fileDir}/${root.fileName}`
 
-    property bool ready: false
-    property string previousHyprlandInstanceSignature: ""
-    property bool isNewHyprlandInstance: previousHyprlandInstanceSignature !== states.hyprlandInstanceSignature
-
-    onReadyChanged: {
-        root.previousHyprlandInstanceSignature = root.states.hyprlandInstanceSignature
-        root.states.hyprlandInstanceSignature = Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") || ""
-    }
-
     Timer {
         id: fileReloadTimer
         interval: 100
@@ -45,7 +36,6 @@ Singleton {
         watchChanges: true
         onFileChanged: fileReloadTimer.restart()
         onAdapterUpdated: fileWriteTimer.restart()
-        onLoaded: root.ready = true
         onLoadFailed: error => {
             console.log("Failed to load persistent states file:", error);
             if (error == FileViewError.FileNotFound) {
@@ -55,9 +45,6 @@ Singleton {
 
         adapter: JsonAdapter {
             id: persistentStatesJsonAdapter
-
-            property string hyprlandInstanceSignature: ""
-
             property JsonObject ai: JsonObject {
                 property string model
                 property real temperature: 0.5

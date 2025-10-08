@@ -16,7 +16,6 @@ Item { // Notification item area
     property bool onlyNotification: false
     property real fontSize: Appearance.font.pixelSize.small
     property real padding: onlyNotification ? 0 : 8
-    property real summaryElideRatio: 0.85
 
     property real dragConfirmThreshold: 70 // Drag further to discard notification
     property real dismissOvershoot: notificationIcon.implicitWidth + 20 // Account for gaps and bouncy animations
@@ -57,12 +56,6 @@ Item { // Notification item area
         root.qmlParent.resetDrag()
         background.anchors.leftMargin = background.anchors.leftMargin; // Break binding
         destroyAnimation.running = true;
-    }
-
-    TextMetrics {
-        id: summaryTextMetrics
-        font.pixelSize: root.fontSize
-        text: root.notificationObject.summary || ""
     }
 
     SequentialAnimation { // Drag finish animation
@@ -171,9 +164,9 @@ Item { // Notification item area
                 visible: !root.onlyNotification || !root.expanded
                 Layout.fillWidth: true
                 implicitHeight: summaryText.implicitHeight
+                // Layout.fillWidth: true
                 StyledText {
                     id: summaryText
-                    Layout.fillWidth: summaryTextMetrics.width >= summaryRow.implicitWidth * root.summaryElideRatio
                     visible: !root.onlyNotification
                     font.pixelSize: root.fontSize
                     color: Appearance.colors.colOnLayer3

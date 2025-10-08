@@ -38,11 +38,10 @@ StyledPopup {
         spacing: 4
 
         // Date + Time row
-        Row {
+        RowLayout {
             spacing: 5
 
             MaterialSymbol {
-                anchors.verticalCenter: parent.verticalCenter
                 fill: 0
                 font.weight: Font.Medium
                 text: "calendar_month"
@@ -50,7 +49,6 @@ StyledPopup {
                 color: Appearance.colors.colOnSurfaceVariant
             }
             StyledText {
-                anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Text.AlignLeft
                 color: Appearance.colors.colOnSurfaceVariant
                 text: `${root.formattedDate}`
@@ -80,26 +78,26 @@ StyledPopup {
         }
 
         // Tasks
-        Column {
+        ColumnLayout {
             spacing: 0
             Layout.fillWidth: true
 
-            Row {
+            RowLayout {
                 spacing: 4
+                Layout.fillWidth: true
                 MaterialSymbol {
-                    anchors.verticalCenter: parent.verticalCenter
                     text: "checklist"
                     color: Appearance.colors.colOnSurfaceVariant
                     font.pixelSize: Appearance.font.pixelSize.large
                 }
                 StyledText {
-                    anchors.verticalCenter: parent.verticalCenter
                     text: Translation.tr("To Do:")
                     color: Appearance.colors.colOnSurfaceVariant
                 }
             }
 
             StyledText {
+                Layout.fillWidth: true
                 horizontalAlignment: Text.AlignLeft
                 wrapMode: Text.Wrap
                 color: Appearance.colors.colOnSurfaceVariant

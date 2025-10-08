@@ -20,6 +20,7 @@ Singleton {
     property double swapUsedPercentage: swapTotal > 0 ? (swapUsed / swapTotal) : 0
     property double cpuUsage: 0
     property var previousCpuStats
+    property double cpuTemperature: 0
 
 	Timer {
 		interval: 1
@@ -29,6 +30,7 @@ Singleton {
             // Reload files
             fileMeminfo.reload()
             fileStat.reload()
+            fileCpuTemp.reload()
 
             // Parse memory and swap usage
             const textMeminfo = fileMeminfo.text()
@@ -53,10 +55,17 @@ Singleton {
 
                 previousCpuStats = { total, idle }
             }
+
+            const tempText = fileCpuTemp.text().trim()
+            if (tempText) {
+                cpuTemperature = Number(tempText) / 1000.0
+            }
+
             interval = Config.options?.resources?.updateInterval ?? 3000
         }
 	}
 
 	FileView { id: fileMeminfo; path: "/proc/meminfo" }
     FileView { id: fileStat; path: "/proc/stat" }
+    FileView { id: fileCpuTemp; path: "/sys/class/hwmon/hwmon4/temp1_input" }
 }

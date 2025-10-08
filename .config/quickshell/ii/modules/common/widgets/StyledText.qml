@@ -10,7 +10,7 @@ Text {
     renderType: Text.NativeRendering
     verticalAlignment: Text.AlignVCenter
     font {
-        hintingPreference: Font.PreferDefaultHinting
+        hintingPreference: Font.PreferFullHinting
         family: Appearance?.font.family.main ?? "sans-serif"
         pixelSize: Appearance?.font.pixelSize.small ?? 15
     }

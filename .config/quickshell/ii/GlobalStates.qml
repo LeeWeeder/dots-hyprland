@@ -54,6 +54,14 @@ Singleton {
         }
     }
 
+    GlobalShortcut {
+        appid: "custom-shortcut"
+        name: "toggleSessionOpen"
+        onPressed: {
+            sessionOpen = true
+        }
+    }
+
     IpcHandler {
 		target: "zoom"
 
