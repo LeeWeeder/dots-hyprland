@@ -14,7 +14,6 @@ MouseArea {
     required property LockContext context
     property bool active: false
     property bool showInputField: active || context.currentText.length > 0
-    readonly property bool requirePasswordToPower: Config.options.lock.security.requirePasswordToPower
 
     // Force focus on entry
     function forceFieldFocus() {
@@ -74,10 +73,7 @@ MouseArea {
     //     }
     //     implicitHeight: 40
     //     colBackground: Appearance.colors.colLayer2
-    //     onClicked: {
-    //         context.unlocked(LockContext.ActionEnum.Unlock);
-    //         GlobalStates.screenLocked = false;
-    //     }
+    //     onClicked: context.unlocked()
     //     contentItem: StyledText {
     //         text: "[[ DEBUG BYPASS ]]"
     //     }
@@ -140,15 +136,7 @@ MouseArea {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 iconSize: 24
-                text: {
-                    if (root.context.targetAction === LockContext.ActionEnum.Unlock) {
-                        return "arrow_right_alt";
-                    } else if (root.context.targetAction === LockContext.ActionEnum.Poweroff) {
-                        return "power_settings_new";
-                    } else if (root.context.targetAction === LockContext.ActionEnum.Reboot) {
-                        return "restart_alt";
-                    }
-                }
+                text: "arrow_right_alt"
                 color: confirmButton.enabled ? Appearance.colors.colOnPrimary : Appearance.colors.colSubtext
             }
         }
@@ -167,33 +155,47 @@ MouseArea {
         opacity: root.toolbarOpacity
 
         // Username
-        IconAndTextPair {
+        RowLayout {
+            spacing: 6
             Layout.leftMargin: 8
-            icon: "account_circle"
-            text: SystemInfo.username
+            Layout.fillHeight: true
+
+            MaterialSymbol {
+                id: userIcon
+                Layout.alignment: Qt.AlignVCenter
+                fill: 1
+                text: "account_circle"
+                iconSize: Appearance.font.pixelSize.huge
+                color: Appearance.colors.colOnSurfaceVariant
+            }
+            StyledText {
+                Layout.alignment: Qt.AlignVCenter
+                text: SystemInfo.username
+                color: Appearance.colors.colOnSurfaceVariant
+            }
         }
 
         // Keyboard layout (Xkb)
         Loader {
+            Layout.leftMargin: 8
             Layout.rightMargin: 8
             Layout.fillHeight: true
 
             active: true
             visible: active
 
-            sourceComponent: Row {
+            sourceComponent: RowLayout {
                 spacing: 8
 
                 MaterialSymbol {
                     id: keyboardIcon
-                    anchors.verticalCenter: parent.verticalCenter
+                    Layout.alignment: Qt.AlignVCenter
                     fill: 1
                     text: "keyboard_alt"
                     iconSize: Appearance.font.pixelSize.huge
                     color: Appearance.colors.colOnSurfaceVariant
                 }
                 Loader {
-                    anchors.verticalCenter: parent.verticalCenter
                     sourceComponent: StyledText {
                         text: HyprlandXkb.currentLayoutCode
                         color: Appearance.colors.colOnSurfaceVariant
@@ -227,94 +229,61 @@ MouseArea {
         scale: root.toolbarScale
         opacity: root.toolbarOpacity
 
-        IconAndTextPair {
+        RowLayout {
             visible: UPower.displayDevice.isLaptopBattery
-            icon: Battery.isCharging ? "bolt" : "battery_android_full"
-            text: Math.round(Battery.percentage * 100)
-            color: (Battery.isLow && !Battery.isCharging) ? Appearance.colors.colError : Appearance.colors.colOnSurfaceVariant
+            spacing: 6
+            Layout.fillHeight: true
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
+
+            MaterialSymbol {
+                id: boltIcon
+                Layout.alignment: Qt.AlignVCenter
+                Layout.leftMargin: -2
+                Layout.rightMargin: -2
+                fill: 1
+                text: Battery.isCharging ? "bolt" : "battery_android_full"
+                iconSize: Appearance.font.pixelSize.huge
+                animateChange: true
+                color: (Battery.isLow && !Battery.isCharging) ? Appearance.colors.colError : Appearance.colors.colOnSurfaceVariant
+            }
+            StyledText {
+                Layout.alignment: Qt.AlignVCenter
+                text: Math.round(Battery.percentage * 100)
+                color: (Battery.isLow && !Battery.isCharging) ? Appearance.colors.colError : Appearance.colors.colOnSurfaceVariant
+            }
         }
 
-        ActionToolbarIconButton {
+        ToolbarButton {
             id: sleepButton
+            implicitWidth: height
+
             onClicked: Session.suspend()
-            text: "dark_mode"
+
+            contentItem: MaterialSymbol {
+                anchors.centerIn: parent
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                iconSize: 24
+                text: "dark_mode"
+                color: Appearance.colors.colOnSurfaceVariant
+            }
         }
 
-        PasswordGuardedActionToolbarIconButton {
+        ToolbarButton {
             id: powerButton
-            text: "power_settings_new"
-            targetAction: LockContext.ActionEnum.Poweroff
-        }
+            implicitWidth: height
 
-        PasswordGuardedActionToolbarIconButton {
-            id: rebootButton
-            text: "restart_alt"
-            targetAction: LockContext.ActionEnum.Reboot
-        }
-    }
+            onClicked: Session.poweroff()
 
-    component PasswordGuardedActionToolbarIconButton: ActionToolbarIconButton {
-        id: guardedBtn
-        required property var targetAction
-
-        toggled: root.context.targetAction === guardedBtn.targetAction
-
-        onClicked: {
-            if (!root.requirePasswordToPower) {
-                root.context.unlocked(guardedBtn.targetAction);
-                return;
+            contentItem: MaterialSymbol {
+                anchors.centerIn: parent
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                iconSize: 24
+                text: "power_settings_new"
+                color: Appearance.colors.colOnSurfaceVariant
             }
-            if (root.context.targetAction === guardedBtn.targetAction) {
-                root.context.resetTargetAction();
-            } else {
-                root.context.targetAction = guardedBtn.targetAction;
-                root.context.shouldReFocus();
-            }
-        }
-    }
-
-    component ActionToolbarIconButton: ToolbarButton {
-        id: iconBtn
-        implicitWidth: height
-
-        colBackgroundToggled: Appearance.colors.colSecondaryContainer
-        colBackgroundToggledHover: Appearance.colors.colSecondaryContainerHover
-        colRippleToggled: Appearance.colors.colSecondaryContainerActive
-
-        contentItem: MaterialSymbol {
-            anchors.centerIn: parent
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            iconSize: 24
-            text: iconBtn.text
-            color: iconBtn.toggled ? Appearance.colors.colOnSecondaryContainer : Appearance.colors.colOnSurfaceVariant
-        }
-    }
-
-    component IconAndTextPair: Row {
-        id: pair
-        required property string icon
-        required property string text
-        property color color: Appearance.colors.colOnSurfaceVariant
-
-        spacing: 4
-        Layout.fillHeight: true
-        Layout.leftMargin: 10
-        Layout.rightMargin: 10
-        
-
-        MaterialSymbol {
-            anchors.verticalCenter: parent.verticalCenter
-            fill: 1
-            text: pair.icon
-            iconSize: Appearance.font.pixelSize.huge
-            animateChange: true
-            color: pair.color
-        }
-        StyledText {
-            anchors.verticalCenter: parent.verticalCenter
-            text: pair.text
-            color: pair.color
         }
     }
 }

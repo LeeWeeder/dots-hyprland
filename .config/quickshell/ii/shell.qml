@@ -38,17 +38,18 @@ ShellRoot {
     property bool enableBackground: true
     property bool enableCheatsheet: true
     property bool enableCrosshair: true
-    property bool enableDock: true
+    property bool enableDock: false
     property bool enableLock: true
     property bool enableMediaControls: true
     property bool enableNotificationPopup: true
-    property bool enableOnScreenDisplay: true
-    property bool enableOnScreenKeyboard: true
+    property bool enableOnScreenDisplayBrightness: true
+    property bool enableOnScreenDisplayVolume: true
+    property bool enableOnScreenKeyboard: false
     property bool enableOverview: true
     property bool enableReloadPopup: true
     property bool enableScreenCorners: true
     property bool enableSessionScreen: true
-    property bool enableSidebarLeft: true
+    property bool enableSidebarLeft: false
     property bool enableSidebarRight: true
     property bool enableVerticalBar: true
     property bool enableWallpaperSelector: true
@@ -71,7 +72,8 @@ ShellRoot {
     LazyLoader { active: enableLock; component: Lock {} }
     LazyLoader { active: enableMediaControls; component: MediaControls {} }
     LazyLoader { active: enableNotificationPopup; component: NotificationPopup {} }
-    LazyLoader { active: enableOnScreenDisplay; component: OnScreenDisplay {} }
+    LazyLoader { active: enableOnScreenDisplayBrightness; component: OnScreenDisplayBrightness {} }
+    LazyLoader { active: enableOnScreenDisplayVolume; component: OnScreenDisplayVolume {} }
     LazyLoader { active: enableOnScreenKeyboard; component: OnScreenKeyboard {} }
     LazyLoader { active: enableOverview; component: Overview {} }
     LazyLoader { active: enableReloadPopup; component: ReloadPopup {} }

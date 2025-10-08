@@ -56,7 +56,7 @@ Item {
             StyledSlider {
                 id: slider
                 value: root.node.audio.volume
-                onMoved: root.node.audio.volume = value
+                onValueChanged: root.node.audio.volume = value
             }
         }
     }

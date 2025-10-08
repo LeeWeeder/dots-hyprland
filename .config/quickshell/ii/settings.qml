@@ -72,12 +72,12 @@ ApplicationWindow {
     }
 
     minimumWidth: 750
-    minimumHeight: 500
-    width: 1100
-    height: 750
+    width: 1000
+    height: mainLayout.implicitHeight + (contentPadding * 2)
     color: Appearance.m3colors.m3background
 
     ColumnLayout {
+	id: mainLayout
         anchors {
             fill: parent
             margins: contentPadding
@@ -143,11 +143,10 @@ ApplicationWindow {
 
         RowLayout { // Window content with navigation rail and content pane
             Layout.fillWidth: true
-            Layout.fillHeight: true
             spacing: contentPadding
             Item {
                 id: navRailWrapper
-                Layout.fillHeight: true
+                Layout.preferredHeight: navRail.implicitHeight
                 Layout.margins: 5
                 implicitWidth: navRail.expanded ? 150 : fab.baseSize
                 Behavior on implicitWidth {
@@ -158,7 +157,6 @@ ApplicationWindow {
                     anchors {
                         left: parent.left
                         top: parent.top
-                        bottom: parent.bottom
                     }
                     spacing: 10
                     expanded: root.width > 900
@@ -200,14 +198,11 @@ ApplicationWindow {
                         }
                     }
 
-                    Item {
-                        Layout.fillHeight: true
-                    }
                 }
             }
             Rectangle { // Content container
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.preferredHeight: navRailWrapper.height
                 color: Appearance.m3colors.m3surfaceContainerLow
                 radius: Appearance.rounding.windowRounding - root.contentPadding
 
@@ -224,8 +219,10 @@ ApplicationWindow {
                     Connections {
                         target: root
                         function onCurrentPageChanged() {
-                            switchAnim.complete();
-                            switchAnim.start();
+                            if (pageLoader.sourceComponent !== root.pages[root.currentPage].component) {
+                                switchAnim.complete();
+                                switchAnim.start();
+                            }
                         }
                     }
 

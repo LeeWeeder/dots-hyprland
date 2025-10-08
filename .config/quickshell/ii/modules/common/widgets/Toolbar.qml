@@ -16,7 +16,6 @@ Item {
     default property alias data: toolbarLayout.data
     implicitWidth: background.implicitWidth
     implicitHeight: background.implicitHeight
-    property alias radius: background.radius
 
     StyledRectangularShadow {
         target: background
@@ -24,11 +23,11 @@ Item {
 
     Rectangle {
         id: background
-        anchors.fill: parent
+        anchors.centerIn: parent
         color: Appearance.m3colors.m3surfaceContainer // Needs to be opaque
         implicitHeight: Math.max(toolbarLayout.implicitHeight + root.padding * 2, 56)
         implicitWidth: toolbarLayout.implicitWidth + root.padding * 2
-        radius: height / 2
+        radius: Appearance.rounding.full
 
         RowLayout {
             id: toolbarLayout

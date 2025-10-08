@@ -14,13 +14,12 @@ ContentPage {
     forceWidth: true
 
     Process {
-        id: randomWallProc
+        id: konachanWallProc
         property string status: ""
-        property string scriptPath: `${Directories.scriptPath}/colors/random/random_konachan_wall.sh`
-        command: ["bash", "-c", FileUtils.trimFileProtocol(randomWallProc.scriptPath)]
+        command: ["bash", "-c", FileUtils.trimFileProtocol(`${Directories.scriptPath}/colors/random_konachan_wall.sh`)]
         stdout: SplitParser {
             onRead: data => {
-                randomWallProc.status = data.trim();
+                konachanWallProc.status = data.trim();
             }
         }
     }
@@ -91,33 +90,17 @@ ContentPage {
 
             ColumnLayout {
                 RippleButtonWithIcon {
-                    enabled: !randomWallProc.running
+                    id: rndWallBtn
                     visible: Config.options.policies.weeb === 1
                     Layout.fillWidth: true
                     buttonRadius: Appearance.rounding.small
                     materialIcon: "ifl"
-                    mainText: randomWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: Konachan")
+                    mainText: konachanWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: Konachan")
                     onClicked: {
-                        randomWallProc.scriptPath = `${Directories.scriptPath}/colors/random/random_konachan_wall.sh`;
-                        randomWallProc.running = true;
+                        konachanWallProc.running = true;
                     }
                     StyledToolTip {
                         text: Translation.tr("Random SFW Anime wallpaper from Konachan\nImage is saved to ~/Pictures/Wallpapers")
-                    }
-                }
-                RippleButtonWithIcon {
-                    enabled: !randomWallProc.running
-                    visible: Config.options.policies.weeb === 1
-                    Layout.fillWidth: true
-                    buttonRadius: Appearance.rounding.small
-                    materialIcon: "ifl"
-                    mainText: randomWallProc.running ? Translation.tr("Be patient...") : Translation.tr("Random: osu! seasonal")
-                    onClicked: {
-                        randomWallProc.scriptPath = `${Directories.scriptPath}/colors/random/random_osu_wall.sh`;
-                        randomWallProc.running = true;
-                    }
-                    StyledToolTip {
-                        text: Translation.tr("Random osu! seasonal background\nImage is saved to ~/Pictures/Wallpapers")
                     }
                 }
                 RippleButtonWithIcon {
@@ -171,6 +154,17 @@ ContentPage {
                         dark: true
                     }
                 }
+
+                ConfigSwitch {
+                    text: Translation.tr("Transparency")
+                    checked: Config.options.appearance.transparency.enable
+                    onCheckedChanged: {
+                        Config.options.appearance.transparency.enable = checked;
+                    }
+                    StyledToolTip {
+                        text: Translation.tr("Might look ass. Unsupported.")
+                    }
+                }
             }
         }
 
@@ -218,18 +212,6 @@ ContentPage {
                     "displayName": Translation.tr("Tonal Spot")
                 }
             ]
-        }
-
-        ConfigSwitch {
-            buttonIcon: "ev_shadow"
-            text: Translation.tr("Transparency")
-            checked: Config.options.appearance.transparency.enable
-            onCheckedChanged: {
-                Config.options.appearance.transparency.enable = checked;
-            }
-            StyledToolTip {
-                text: Translation.tr("Might look ass. Unsupported.")
-            }
         }
     }
 

@@ -1,8 +1,13 @@
+import qs.services
 import qs.modules.common
 import qs.modules.common.widgets
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Effects
 import QtQuick.Layouts
+import Quickshell
 import Quickshell.Widgets
+// import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
@@ -16,23 +21,19 @@ Item {
     property real valueIndicatorLeftPadding: 10
     property real valueIndicatorRightPadding: 20 // An icon is circle ish, a column isn't, hence the extra padding
 
-    implicitWidth: Appearance.sizes.osdWidth + 2 * Appearance.sizes.elevationMargin
-    implicitHeight: valueIndicator.implicitHeight + 2 * Appearance.sizes.elevationMargin
+    Layout.margins: Appearance.sizes.elevationMargin
+    implicitWidth: Appearance.sizes.osdWidth
+    implicitHeight: valueIndicator.implicitHeight
 
     StyledRectangularShadow {
         target: valueIndicator
     }
-    Rectangle {
+    WrapperRectangle {
         id: valueIndicator
-        anchors {
-            fill: parent
-            margins: Appearance.sizes.elevationMargin
-        }
+        anchors.fill: parent
         radius: Appearance.rounding.full
         color: Appearance.colors.colLayer0
-
         implicitWidth: valueRow.implicitWidth
-        implicitHeight: valueRow.implicitHeight
 
         RowLayout { // Icon on the left, stuff on the right
             id: valueRow
@@ -47,7 +48,6 @@ Item {
                 Layout.leftMargin: valueIndicatorLeftPadding
                 Layout.topMargin: valueIndicatorVerticalPadding
                 Layout.bottomMargin: valueIndicatorVerticalPadding
-
                 MaterialSymbol { // Icon
                     anchors {
                         centerIn: parent

@@ -14,8 +14,6 @@ SpinBox {
     property real innerButtonRadius: Appearance.rounding.unsharpen
     editable: true
 
-    opacity: root.enabled ? 1 : 0.4
-
     background: Rectangle {
         color: Appearance.colors.colLayer2
         radius: root.radius

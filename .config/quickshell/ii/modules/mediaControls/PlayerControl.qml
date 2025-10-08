@@ -1,4 +1,3 @@
-pragma ComponentBehavior: Bound
 import qs.modules.common
 import qs.modules.common.models
 import qs.modules.common.widgets
@@ -161,7 +160,7 @@ Item { // Player instance
                     }
                 }
 
-                StyledImage { // Art image
+                Image { // Art image
                     id: mediaArt
                     property int size: parent.height
                     anchors.fill: parent
@@ -170,6 +169,7 @@ Item { // Player instance
                     fillMode: Image.PreserveAspectCrop
                     cache: false
                     antialiasing: true
+                    asynchronous: true
 
                     width: size
                     height: size
@@ -233,41 +233,16 @@ Item { // Player instance
                         Item {
                             id: progressBarContainer
                             Layout.fillWidth: true
-                            implicitHeight: Math.max(sliderLoader.implicitHeight, progressBarLoader.implicitHeight)
+                            implicitHeight: progressBar.implicitHeight
 
-                            Loader {
-                                id: sliderLoader
+                            StyledProgressBar { 
+                                id: progressBar
                                 anchors.fill: parent
-                                active: playerController.player?.canSeek ?? false
-                                sourceComponent: StyledSlider { 
-                                    configuration: StyledSlider.Configuration.Wavy
-                                    highlightColor: blendedColors.colPrimary
-                                    trackColor: blendedColors.colSecondaryContainer
-                                    handleColor: blendedColors.colPrimary
-                                    value: playerController.player?.position / playerController.player?.length
-                                    onMoved: {
-                                        playerController.player.position = value * playerController.player.length;
-                                    }
-                                }
+                                highlightColor: blendedColors.colPrimary
+                                trackColor: blendedColors.colSecondaryContainer
+                                value: playerController.player?.position / playerController.player?.length
+                                sperm: playerController.player?.isPlaying
                             }
-
-                            Loader {
-                                id: progressBarLoader
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    left: parent.left
-                                    right: parent.right
-                                }
-                                active: !(playerController.player?.canSeek ?? false)
-                                sourceComponent: StyledProgressBar { 
-                                    wavy: playerController.player?.isPlaying
-                                    highlightColor: blendedColors.colPrimary
-                                    trackColor: blendedColors.colSecondaryContainer
-                                    value: playerController.player?.position / playerController.player?.length
-                                }
-                            }
-
-                            
                         }
                         TrackChangeButton {
                             iconName: "skip_next"

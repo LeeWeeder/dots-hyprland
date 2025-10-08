@@ -95,18 +95,6 @@ Singleton {
         deleteProc.deleteEntry(entry);
     }
 
-    Process {
-        id: wipeProc
-        command: [root.cliphistBinary, "wipe"]
-        onExited: (exitCode, exitStatus) => {
-            root.refresh();
-        }
-    }
-
-    function wipe() {
-        wipeProc.running = true;
-    }
-
     Connections {
         target: Quickshell
         function onClipboardTextChanged() {

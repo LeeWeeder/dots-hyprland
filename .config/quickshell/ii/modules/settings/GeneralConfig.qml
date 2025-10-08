@@ -15,7 +15,6 @@ ContentPage {
         title: Translation.tr("Audio")
 
         ConfigSwitch {
-            buttonIcon: "hearing"
             text: Translation.tr("Earbang protection")
             checked: Config.options.audio.protection.enable
             onCheckedChanged: {
@@ -26,9 +25,8 @@ ContentPage {
             }
         }
         ConfigRow {
-            enabled: Config.options.audio.protection.enable
+            // uniform: true
             ConfigSpinBox {
-                icon: "arrow_warm_up"
                 text: Translation.tr("Max allowed increase")
                 value: Config.options.audio.protection.maxAllowedIncrease
                 from: 0
@@ -39,7 +37,6 @@ ContentPage {
                 }
             }
             ConfigSpinBox {
-                icon: "vertical_align_top"
                 text: Translation.tr("Volume limit")
                 value: Config.options.audio.protection.maxAllowed
                 from: 0
@@ -59,7 +56,6 @@ ContentPage {
         ConfigRow {
             uniform: true
             ConfigSpinBox {
-                icon: "warning"
                 text: Translation.tr("Low warning")
                 value: Config.options.battery.low
                 from: 0
@@ -70,7 +66,6 @@ ContentPage {
                 }
             }
             ConfigSpinBox {
-                icon: "dangerous"
                 text: Translation.tr("Critical warning")
                 value: Config.options.battery.critical
                 from: 0
@@ -82,10 +77,8 @@ ContentPage {
             }
         }
         ConfigRow {
-            uniform: false
-            Layout.fillWidth: false
+            uniform: true
             ConfigSwitch {
-                buttonIcon: "pause"
                 text: Translation.tr("Automatic suspend")
                 checked: Config.options.battery.automaticSuspend
                 onCheckedChanged: {
@@ -96,8 +89,7 @@ ContentPage {
                 }
             }
             ConfigSpinBox {
-                enabled: Config.options.battery.automaticSuspend
-                text: Translation.tr("at")
+                text: Translation.tr("Suspend at")
                 value: Config.options.battery.suspend
                 from: 0
                 to: 100
