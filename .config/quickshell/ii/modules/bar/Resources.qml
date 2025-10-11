@@ -19,13 +19,14 @@ MouseArea {
         anchors.leftMargin: 4
         anchors.rightMargin: 4
 
-        Resource {
+        PercentageResource {
             iconName: "memory"
+            shown: true
             percentage: ResourceUsage.memoryUsedPercentage
             warningThreshold: Config.options.bar.resources.memoryWarningThreshold
         }
 
-        Resource {
+        PercentageResource {
             iconName: "swap_horiz"
             percentage: ResourceUsage.swapUsedPercentage
             shown: (Config.options.bar.resources.alwaysShowSwap && percentage > 0) || 
@@ -35,7 +36,7 @@ MouseArea {
             warningThreshold: Config.options.bar.resources.swapWarningThreshold
         }
 
-        Resource {
+        PercentageResource {
             iconName: "planner_review"
             percentage: ResourceUsage.cpuUsage
             shown: Config.options.bar.resources.alwaysShowCpu || 
@@ -45,6 +46,14 @@ MouseArea {
             warningThreshold: Config.options.bar.resources.cpuWarningThreshold
         }
 
+        ValueResource {
+            iconName: "device_thermostat"
+            value: ResourceUsage.cpuTemperature
+            unit: "°C"
+            warningValue: 100
+            maxValue: 100
+            shown: true
+        }
     }
 
     ResourcesPopup {
