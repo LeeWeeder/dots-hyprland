@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import qs.modules.common
 import qs.modules.common.models
 import qs.modules.common.widgets
@@ -166,7 +167,7 @@ Item { // Player instance
                     }
                 }
 
-                Image { // Art image
+                StyledImage { // Art image
                     id: mediaArt
                     property int size: parent.height
                     anchors.fill: parent
@@ -175,7 +176,6 @@ Item { // Player instance
                     fillMode: Image.PreserveAspectCrop
                     cache: false
                     antialiasing: true
-                    asynchronous: true
 
                     width: size
                     height: size
@@ -239,10 +239,10 @@ Item { // Player instance
                         Item {
                             id: progressBarContainer
                             Layout.fillWidth: true
-                            implicitHeight: progressBar.implicitHeight
+                            implicitHeight: Math.max(sliderLoader.implicitHeight, progressBarLoader.implicitHeight)
 
-                            StyledProgressBar { 
-                                id: progressBar
+                            Loader {
+                                id: sliderLoader
                                 anchors.fill: parent
                                 active: root.player?.canSeek ?? false
                                 sourceComponent: StyledSlider { 
@@ -272,6 +272,8 @@ Item { // Player instance
                                     value: root.player?.position / root.player?.length
                                 }
                             }
+
+                            
                         }
                         TrackChangeButton {
                             iconName: "skip_next"
