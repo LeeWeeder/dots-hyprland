@@ -112,7 +112,7 @@ Item { // Bar content region
 
             Media {
                 visible: root.useShortenedForm < 2
-                Layout.fillWidth: true
+                Layout.fillWidth: false
             }
         }
 
