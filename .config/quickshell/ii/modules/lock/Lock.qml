@@ -102,7 +102,6 @@ Scope {
 	Connections {
         target: Config
         function onReadyChanged() {
-			print("lock after config")
             if (Config.options.lock.launchOnStartup && Config.ready && Persistent.ready && Persistent.isNewHyprlandInstance) {
                 Hyprland.dispatch("global quickshell:lock")
             }
@@ -111,7 +110,6 @@ Scope {
     Connections {
         target: Persistent
         function onReadyChanged() {
-			print("lock after persistent")
             if (Config.options.lock.launchOnStartup && Config.ready && Persistent.ready && Persistent.isNewHyprlandInstance) {
                 Hyprland.dispatch("global quickshell:lock")
             }
