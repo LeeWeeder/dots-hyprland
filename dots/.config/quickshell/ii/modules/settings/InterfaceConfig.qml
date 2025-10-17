@@ -460,6 +460,8 @@ ContentPage {
                         Config.options.sidebar.cornerOpen.enable = checked;
                     }
                 }
+            }
+            Row {
                 ConfigSwitch {
                     text: Translation.tr("Hover to trigger")
                     checked: Config.options.sidebar.cornerOpen.clickless
@@ -469,6 +471,18 @@ ContentPage {
 
                     StyledToolTip {
                         text: Translation.tr("When this is off you'll have to click")
+                    }
+                }
+                ConfigSwitch {
+                    enabled: !Config.options.sidebar.cornerOpen.clickless
+                    text: Translation.tr("but force at absolute corner")
+                    checked: Config.options.sidebar.cornerOpen.clicklessCornerEnd
+                    onCheckedChanged: {
+                        Config.options.sidebar.cornerOpen.clicklessCornerEnd = checked;
+                    }
+
+                    StyledToolTip {
+                        text: Translation.tr("When the previous option is off and this is on,\nyou can still hover the corner's end to open sidebar,\nand the remaining area can be used for volume/brightness scroll")
                     }
                 }
             }
@@ -603,6 +617,20 @@ ContentPage {
             }
             StyledToolTip {
                 text: Translation.tr("Such regions could be images or parts of the screen that have some containment.\nMight not always be accurate.\nThis is done with an image processing algorithm run locally and no AI is used.")
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "wallpaper_slideshow"
+        title: Translation.tr("Wallpaper selector")
+
+        ConfigSwitch {
+            buttonIcon: "ad"
+            text: Translation.tr('Use system file picker')
+            checked: Config.options.wallpaperSelector.useSystemFileDialog
+            onCheckedChanged: {
+                Config.options.wallpaperSelector.useSystemFileDialog = checked;
             }
         }
     }

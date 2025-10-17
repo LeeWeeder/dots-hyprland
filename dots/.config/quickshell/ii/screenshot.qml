@@ -405,7 +405,18 @@ ShellRoot {
                         color: "transparent"
                         border.color: root.selectionBorderColor
                         border.width: 2
-                        radius: root.standardRounding
+                        // radius: root.standardRounding
+                        radius: 0 // TODO: figure out how to make the overlay thing work with rounding
+                    }
+                    StyledText {
+                        z: 2
+                        anchors {
+                            top: selectionBorder.bottom
+                            right: selectionBorder.right
+                            margins: 8
+                        }
+                        color: root.selectionBorderColor
+                        text: `${Math.round(panelWindow.regionWidth)} x ${Math.round(panelWindow.regionHeight)}`
                     }
 
                     // Instructions
