@@ -128,7 +128,7 @@ Slider {
             TrackDot {
                 required property real modelData
                 value: modelData
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenter: parent?.verticalCenter
             }
         }
     }
