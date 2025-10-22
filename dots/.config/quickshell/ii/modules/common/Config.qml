@@ -10,6 +10,7 @@ Singleton {
     property alias options: configOptionsJsonAdapter
     property bool ready: false
     property int readWriteDelay: 50 // milliseconds
+    property bool blockWrites: false
 
     function setNestedValue(nestedKey, value) {
         let keys = nestedKey.split(".");
@@ -63,6 +64,7 @@ Singleton {
         id: configFileView
         path: root.filePath
         watchChanges: true
+        blockWrites: root.blockWrites
         onFileChanged: fileReloadTimer.restart()
         onAdapterUpdated: fileWriteTimer.restart()
         onLoaded: root.ready = true
@@ -351,6 +353,20 @@ Singleton {
                 property real columns: 5
             }
 
+            property JsonObject regionSelector: JsonObject {
+                property JsonObject targetRegions: JsonObject {
+                    property bool windows: true
+                    property bool layers: false
+                    property bool content: true
+                    property bool showLabel: false
+                    property real opacity: 0.3
+                }
+                property JsonObject circle: JsonObject {
+                    property int strokeWidth: 6
+                    property int padding: 40
+                }
+            }
+
             property JsonObject resources: JsonObject {
                 property int updateInterval: 3000
             }
@@ -369,6 +385,10 @@ Singleton {
                     property string math: "="
                     property string shellCommand: "$"
                     property string webSearch: "?"
+                }
+                property JsonObject imageSearch: JsonObject {
+                    property string imageSearchEngineBaseUrl: "https://lens.google.com/uploadbyurl?url="
+                    property bool useCircleSelection: false
                 }
             }
 
@@ -454,10 +474,6 @@ Singleton {
 
             property JsonObject hacks: JsonObject {
                 property int arbitraryRaceConditionDelay: 20 // milliseconds
-            }
-
-            property JsonObject screenshotTool: JsonObject {
-                property bool showContentRegions: true
             }
 
             property JsonObject workSafety: JsonObject {

@@ -254,7 +254,7 @@ MouseArea {
             }
         }
 
-        ToolbarButton {
+        IconToolbarButton {
             id: sleepButton
             implicitWidth: height
 
@@ -270,20 +270,63 @@ MouseArea {
             }
         }
 
-        ToolbarButton {
+        PasswordGuardedIconToolbarButton {
             id: powerButton
-            implicitWidth: height
+            text: "power_settings_new"
+            targetAction: LockContext.ActionEnum.Poweroff
+        }
 
-            onClicked: Session.poweroff()
+        PasswordGuardedIconToolbarButton {
+            id: rebootButton
+            text: "restart_alt"
+            targetAction: LockContext.ActionEnum.Reboot
+        }
+    }
 
-            contentItem: MaterialSymbol {
-                anchors.centerIn: parent
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                iconSize: 24
-                text: "power_settings_new"
-                color: Appearance.colors.colOnSurfaceVariant
+    component PasswordGuardedIconToolbarButton: IconToolbarButton {
+        id: guardedBtn
+        required property var targetAction
+
+        toggled: root.context.targetAction === guardedBtn.targetAction
+
+        onClicked: {
+            if (!root.requirePasswordToPower) {
+                root.context.unlocked(guardedBtn.targetAction);
+                return;
             }
+            if (root.context.targetAction === guardedBtn.targetAction) {
+                root.context.resetTargetAction();
+            } else {
+                root.context.targetAction = guardedBtn.targetAction;
+                root.context.shouldReFocus();
+            }
+        }
+    }
+
+    component IconAndTextPair: Row {
+        id: pair
+        required property string icon
+        required property string text
+        property color color: Appearance.colors.colOnSurfaceVariant
+
+        spacing: 4
+        Layout.fillHeight: true
+        Layout.leftMargin: 10
+        Layout.rightMargin: 10
+        
+
+        MaterialSymbol {
+            anchors.verticalCenter: parent.verticalCenter
+            fill: 1
+            text: pair.icon
+            iconSize: Appearance.font.pixelSize.huge
+            animateChange: true
+            color: pair.color
+        }
+        StyledText {
+            anchors.verticalCenter: parent.verticalCenter
+            text: pair.text
+            color: pair.color
         }
     }
 }
