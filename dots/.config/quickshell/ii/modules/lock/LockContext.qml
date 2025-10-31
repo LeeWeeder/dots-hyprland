@@ -1,6 +1,7 @@
 import qs
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Pam
 
 Scope {
@@ -14,6 +15,16 @@ Scope {
     property string currentText: ""
     property bool unlockInProgress: false
     property bool showFailure: false
+    property bool fingerprintsConfigured: false
+    property var targetAction: LockContext.ActionEnum.Unlock
+
+    function resetTargetAction() {
+        root.targetAction = LockContext.ActionEnum.Unlock;
+    }
+
+    function clearText() {
+        root.currentText = "";
+    }
 
     function resetClearTimer() {
         passwordClearTimer.restart();
@@ -41,6 +52,34 @@ Scope {
         pam.start();
     }
 
+    function tryFingerUnlock() {
+        if (root.fingerprintsConfigured) {
+            fingerPam.start();
+        }
+    }
+
+    function stopFingerPam() {
+        fingerPam.abort();
+    }
+
+    Process {
+        id: fingerprintCheckProc
+        running: true
+        command: ["bash", "-c", "fprintd-list $(whoami)"]
+        stdout: StdioCollector {
+            id: fingerprintOutputCollector
+            onStreamFinished: {
+                root.fingerprintsConfigured = fingerprintOutputCollector.text.includes("Fingerprints for user");
+            }
+        }
+        onExited: (exitCode, exitStatus) => {
+            if (exitCode !== 0) {
+                console.warn("fprintd-list command exited with error:", exitCode, exitStatus);
+                root.fingerprintsConfigured = false;
+            }
+        }
+    }
+    
     PamContext {
         id: pam
 
@@ -54,7 +93,8 @@ Scope {
         // pam_unix won't send any important messages so all we need is the completion status.
         onCompleted: result => {
             if (result == PamResult.Success) {
-                root.unlocked();
+                root.unlocked(root.targetAction);
+                stopFingerPam();
             } else {
                 root.showFailure = true;
                 GlobalStates.screenUnlockFailed = true;
@@ -62,6 +102,22 @@ Scope {
 
             root.currentText = "";
             root.unlockInProgress = false;
+        }
+    }
+
+    PamContext {
+        id: fingerPam
+
+        configDirectory: "pam"
+        config: "fprintd.conf"
+
+        onCompleted: result => {
+            if (result == PamResult.Success) {
+                root.unlocked(root.targetAction);
+                stopFingerPam();
+            } else if (result == PamResult.Error) { // if timeout or etc..
+                tryFingerUnlock()
+            }
         }
     }
 }

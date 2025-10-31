@@ -27,7 +27,7 @@ function backup_configs(){
 function ask_backup_configs(){
   showfun backup_clashing_targets
   printf "${STY_RED}"
-  printf "Would you like to backup clashing dirs/files under \"$XDG_CONFIG_HOME\" and \"$XDG_DATA_HOME\" to \"$BACKUP_DIR\"?"
+  printf "Would you like to backup clashing dirs/files under \"$XDG_CONFIG_HOME\" and \"$XDG_DATA_HOME\" to \"$BACKUP_DIR\"?\n"
   printf "${STY_RST}"
   while true;do
     echo "  y = Yes, backup"
@@ -103,9 +103,9 @@ esac
 case $SKIP_FONTCONFIG in
   true) sleep 0;;
   *)
-    case "$II_FONTSET_NAME" in
+    case "$FONTSET_DIR_NAME" in
       "") warning_rsync_delete; v rsync -av --delete dots/.config/fontconfig/ "$XDG_CONFIG_HOME"/fontconfig/ ;;
-      *) warning_rsync_delete; v rsync -av --delete dots-extra/fontsets/$II_FONTSET_NAME/ "$XDG_CONFIG_HOME"/fontconfig/ ;;
+      *) warning_rsync_delete; v rsync -av --delete dots-extra/fontsets/$FONTSET_DIR_NAME/ "$XDG_CONFIG_HOME"/fontconfig/ ;;
     esac;;
 esac
 
